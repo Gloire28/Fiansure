@@ -81,9 +81,9 @@ function GoalDetailPage() {
           <Typography variant="h4" sx={{ fontWeight: 700, textAlign: 'center', color: '#212121' }}>{goal.nom}</Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>Montant cible: {goal.montantCible} FCFA</Typography>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>Total entré: {totalEntrees.toFixed(2)} FCFA</Typography>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>Progression: {progress.toFixed(2)}%</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>Montant cible: {new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(goal.montantCible)} FCFA</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>Total entré: {new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(totalEntrees)} FCFA</Typography>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>Progression: {new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2 }).format(progress)}%</Typography>
             <Typography variant="body1" sx={{ fontWeight: 500 }}>J-{daysRemaining(goal.dateFin)} avant fin</Typography>
           </Box>
 

@@ -43,7 +43,7 @@ function AccountDetailPage() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>{account.nom}</Typography>
         <Typography sx={{ color: account.solde >= 0 ? '#4CAF50' : '#F44336', fontWeight: 600, mb: 3 }}>
-          Solde: {account.solde !== undefined ? account.solde.toFixed(2) : '0.00'} FCFA
+          Solde: {account.solde !== undefined ? new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(account.solde) : '0.00'} FCFA
         </Typography>
 
         <Box sx={{ mb: 4, borderRadius: 3, boxShadow: '0 6px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>

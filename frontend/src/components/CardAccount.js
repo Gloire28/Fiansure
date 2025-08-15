@@ -97,7 +97,7 @@ function CardAccount({ account, onDelete }) {
                 fontSize: '1.1rem',
                 mb: 1
               }}>
-                {totalBalance.toFixed(2)} FCFA
+                {new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(totalBalance)} FCFA
               </Typography>
               {/* Mini-indicateur visuel */}
               <Box sx={{ width: '100%' }}>
