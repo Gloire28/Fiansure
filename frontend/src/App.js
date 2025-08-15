@@ -13,24 +13,30 @@ import AccountCreatePage from './pages/AccountCreatePage';
 import AccountsTrashPage from './pages/AccountsTrashPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import BottomNav from './components/BottomNav';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
 
-  const handleLogin = () => {
+  const handleLogin = (name) => {
     setIsAuthenticated(true);
-    console.log('User logged in');
+    setUserName(name);
+    localStorage.setItem('userName', name);
+    console.log('User logged in with name:', name);
   };
   
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('userName');
     setIsAuthenticated(false);
+    setUserName('');
     console.log('User logged out');
   };
 
   return (
     <>
-      <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} userName={userName} />
       <Routes>
         <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <LoginPage onLogin={handleLogin} />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to="/home" /> : <RegisterPage onLogin={handleLogin} />} />
@@ -46,6 +52,7 @@ function App() {
         <Route path="/comptes/:id" element={isAuthenticated ? <AccountDetailPage /> : <Navigate to="/login" />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
+      <BottomNav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
     </>
   );
 }

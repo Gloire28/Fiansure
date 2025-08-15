@@ -1,47 +1,34 @@
 import React, { useContext } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Switch, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, IconButton, Switch, Box, Tooltip } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Logo from '@mui/icons-material/AccountBalance';
 import { ThemeContext } from '../context/ThemeContext';
 
-function Header({ isAuthenticated, onLogout }) {
-  const navigate = useNavigate();
+function Header({ isAuthenticated, userName }) {
   const { mode, toggleTheme } = useContext(ThemeContext);
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: '#1976D2', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      <Toolbar>
-        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-          <Logo sx={{ mr: 1 }} />
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>Finansure</Typography>
-        </Box>
+    <AppBar position="sticky" sx={{ bgcolor: '#1976D2', boxShadow: '0 4px 10px rgba(0,0,0,0.15)' }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        {/* App Name */}
+        <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 1 }}>
+          Finansure
+        </Typography>
+
+        {/* Theme Toggle */}
         {isAuthenticated && (
-          <>
-            <IconButton color="inherit" onClick={() => {
-              toggleTheme();
-              console.log('Theme toggle button clicked');
-            }}>
+          <Tooltip title={`Basculer en mode ${mode === 'dark' ? 'clair' : 'sombre'}`}>
+            <IconButton onClick={toggleTheme} sx={{ color: '#fff' }}>
               <Brightness4Icon />
-              <Switch checked={mode === 'dark'} />
+              <Switch checked={mode === 'dark'} size="small" sx={{ ml: 0.5 }} />
             </IconButton>
-            <Button color="inherit" onClick={() => {
-              navigate('/home');
-              console.log('Navigated to Home');
-            }} sx={{ mx: 1 }}>Accueil</Button>
-            <Button color="inherit" onClick={() => {
-              navigate('/goals');
-              console.log('Navigated to Goals');
-            }} sx={{ mx: 1 }}>Objectifs</Button>
-            <Button color="inherit" onClick={() => {
-              navigate('/comptes');
-              console.log('Navigated to Accounts');
-            }} sx={{ mx: 1 }}>Comptes</Button>
-            <Button color="inherit" onClick={() => {
-              onLogout();
-              console.log('User logged out');
-            }} sx={{ mx: 1 }}>Déconnexion</Button>
-          </>
+          </Tooltip>
+        )}
+
+        {/* User Info */}
+        {isAuthenticated && (
+          <Typography variant="body1" sx={{ color: '#fff', fontWeight: 700 }}>
+            {userName || 'Utilisateur'}
+          </Typography>
         )}
       </Toolbar>
     </AppBar>

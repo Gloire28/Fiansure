@@ -12,24 +12,20 @@ function FormEntryAdd({ goalId, onSuccess }) {
     e.preventDefault();
     if (!isPositiveAmount(form.montant)) {
       setError('Montant doit être positif');
-      console.log('Validation error: Montant non positif', form.montant);
       return;
     }
-    setOpenDialog(true); // Ouvre le pop-up au lieu d'envoyer directement
+    setOpenDialog(true);
   };
 
   const handleConfirm = async () => {
     try {
       const res = await addEntry(goalId, form);
-      console.log('Entry added successfully:', res.data);
       onSuccess(res.data);
       setForm({ montant: '', libelle: '' });
       setError('');
       setOpenDialog(false);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Erreur lors de l\'ajout';
-      setError(errorMessage);
-      console.error('Error adding entry:', err.response?.status, errorMessage);
+      setError(err.response?.data?.message || 'Erreur lors de l\'ajout');
       setOpenDialog(false);
     }
   };
@@ -45,7 +41,7 @@ function FormEntryAdd({ goalId, onSuccess }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
       <TextField
         label="Montant (FCFA)"
         name="montant"
@@ -53,8 +49,8 @@ function FormEntryAdd({ goalId, onSuccess }) {
         value={form.montant}
         onChange={handleChange}
         fullWidth
-        margin="normal"
         required
+        sx={{ bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1 }}
       />
       <TextField
         label="Libellé (optionnel)"
@@ -62,32 +58,23 @@ function FormEntryAdd({ goalId, onSuccess }) {
         value={form.libelle}
         onChange={handleChange}
         fullWidth
-        margin="normal"
+        sx={{ bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1 }}
       />
       {error && <Typography color="error">{error}</Typography>}
-      <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+      <Button type="submit" variant="contained" sx={{ mt: 1, bgcolor: '#1976D2', '&:hover': { bgcolor: '#1565C0' } }}>
         Ajouter
       </Button>
-      <Dialog open={openDialog} onClose={handleCancel}>
+
+      <Dialog open={openDialog} onClose={handleCancel} PaperProps={{ sx: { borderRadius: 3 } }}>
         <DialogTitle>Confirmer l'entrée</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            Montant: {form.montant} FCFA
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            Libellé: {form.libelle || 'Sans libellé'}
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            Date: {new Date().toLocaleDateString()}
-          </Typography>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Typography>Montant: {form.montant} FCFA</Typography>
+          <Typography>Libellé: {form.libelle || 'Sans libellé'}</Typography>
+          <Typography>Date: {new Date().toLocaleDateString()}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel} color="secondary">
-            Annuler
-          </Button>
-          <Button onClick={handleConfirm} variant="contained" color="primary">
-            Confirmer
-          </Button>
+          <Button onClick={handleCancel} color="secondary">Annuler</Button>
+          <Button onClick={handleConfirm} variant="contained" color="primary">Confirmer</Button>
         </DialogActions>
       </Dialog>
     </Box>

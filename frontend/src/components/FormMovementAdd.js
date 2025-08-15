@@ -10,14 +10,11 @@ function FormMovementAdd({ accountId, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log('Adding movement:', { accountId, ...form });
       const res = await addMovement(accountId, form);
-      console.log('Movement added:', res.data);
       setForm({ montant: '', libelle: '', type: 'entree' });
       setError('');
-      onSuccess(res.data); // Appeler onSuccess avec les données mises à jour
+      onSuccess(res.data);
     } catch (err) {
-      console.error('Error adding movement:', err);
       setError(err.response?.data?.message || 'Erreur lors de l\'ajout du mouvement');
     }
   };
@@ -25,24 +22,28 @@ function FormMovementAdd({ accountId, onSuccess }) {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
-    console.log('Form updated:', { ...form, [e.target.name]: e.target.value });
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{ p: 2, maxWidth: 600, mx: 'auto', mt: 2, bgcolor: '#F5F7FA', borderRadius: 2 }}
+        sx={{
+          p: 3,
+          maxWidth: 650,
+          mx: 'auto',
+          mt: 3,
+          bgcolor: '#F5F7FA',
+          borderRadius: 3,
+          boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
+        }}
       >
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
-          Ajouter un Mouvement
-        </Typography>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>Ajouter un Mouvement</Typography>
+        {error && <Alert severity="error">{error}</Alert>}
         <TextField
           label="Montant (FCFA)"
           name="montant"
@@ -50,9 +51,8 @@ function FormMovementAdd({ accountId, onSuccess }) {
           value={form.montant}
           onChange={handleChange}
           fullWidth
-          margin="normal"
-          required
           sx={{ bgcolor: '#FFFFFF', borderRadius: 1 }}
+          required
         />
         <TextField
           label="Libellé"
@@ -60,7 +60,6 @@ function FormMovementAdd({ accountId, onSuccess }) {
           value={form.libelle}
           onChange={handleChange}
           fullWidth
-          margin="normal"
           sx={{ bgcolor: '#FFFFFF', borderRadius: 1 }}
         />
         <TextField
@@ -71,17 +70,12 @@ function FormMovementAdd({ accountId, onSuccess }) {
           onChange={handleChange}
           SelectProps={{ native: true }}
           fullWidth
-          margin="normal"
           sx={{ bgcolor: '#FFFFFF', borderRadius: 1 }}
         >
           <option value="entree">Entrée</option>
           <option value="sortie">Sortie</option>
         </TextField>
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{ mt: 2, bgcolor: '#4CAF50', '&:hover': { bgcolor: '#388E3C' } }}
-        >
+        <Button type="submit" variant="contained" sx={{ mt: 2, bgcolor: '#4CAF50', '&:hover': { bgcolor: '#388E3C' } }}>
           Ajouter
         </Button>
       </Box>

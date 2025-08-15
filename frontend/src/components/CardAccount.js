@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, IconButton } from '@mui/material';
+import { Card, CardContent, Typography, IconButton, Box, LinearProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,7 +18,8 @@ function CardAccount({ account, onDelete }) {
     collect: (monitor) => ({ isDragging: monitor.isDragging() })
   }));
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     if (window.confirm('Supprimer ce compte ?')) {
       try {
         await deleteAccount(account._id);
@@ -44,6 +45,10 @@ function CardAccount({ account, onDelete }) {
     }]
   };
 
+  // Pour le mini-indicateur de solde (pourcentage)
+  const totalBalance = account.solde ?? 0;
+  const balancePercent = Math.min(Math.max((totalBalance / 100000) * 100, 0), 100);
+
   return (
     <motion.div
       ref={drag}
@@ -55,26 +60,86 @@ function CardAccount({ account, onDelete }) {
         mb: 2, 
         borderRadius: 3,
         boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
-        '&:hover': { boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }
+        '&:hover': { boxShadow: '0 8px 24px rgba(0,0,0,0.2)' },
+        width: '100%',
       }}>
         <CardContent onClick={() => {
           navigate(`/comptes/${account._id}`);
           console.log('Navigated to account:', account._id);
         }}>
-          <Typography variant="h6" sx={{ fontWeight: 500 }}>{account.nom}</Typography>
-          <Typography sx={{ color: account.solde >= 0 ? '#4CAF50' : '#F44336' }}>
-            Solde: {account.solde !== undefined ? account.solde.toFixed(2) : '0.00'} FCFA
-          </Typography>
-          <Line 
-            data={chartData} 
-            options={{ 
-              scales: { y: { beginAtZero: true } },
-              plugins: { legend: { display: false } }
-            }} 
-          />
-          <IconButton onClick={handleDelete}>
-            <DeleteIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'stretch', height: '100%' }}>
+            
+            {/* Gauche : Box moderne responsive */}
+            <Box sx={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              p: 2,
+              minWidth: 120,
+              maxWidth: 220,
+              flexShrink: 0,
+              borderRadius: 3,
+              bgcolor: 'linear-gradient(135deg, rgba(25,118,210,0.1), rgba(25,118,210,0.2))',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+              transition: 'all 0.3s',
+              '&:hover': {
+                boxShadow: '0 6px 18px rgba(0,0,0,0.15)',
+              }
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'center', wordBreak: 'break-word', mb: 1 }}>
+                {account.nom}
+              </Typography>
+              <Typography sx={{ 
+                color: totalBalance >= 0 ? '#4CAF50' : '#F44336', 
+                fontWeight: 500,
+                textAlign: 'center', 
+                fontSize: '1.1rem',
+                mb: 1
+              }}>
+                {totalBalance.toFixed(2)} FCFA
+              </Typography>
+              {/* Mini-indicateur visuel */}
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress 
+                  variant="determinate" 
+                  value={balancePercent} 
+                  sx={{
+                    height: 8,
+                    borderRadius: 5,
+                    backgroundColor: 'rgba(0,0,0,0.05)',
+                    '& .MuiLinearProgress-bar': {
+                      bgcolor: totalBalance >= 0 ? '#4CAF50' : '#F44336'
+                    }
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Droite : Graphique */}
+            <Box sx={{ 
+              flexGrow: 1, 
+              p: 2,
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              <Line 
+                data={chartData} 
+                options={{ 
+                  scales: { y: { beginAtZero: true } },
+                  plugins: { legend: { display: false } },
+                  maintainAspectRatio: false,
+                  height: 150
+                }} 
+              />
+            </Box>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <IconButton onClick={handleDelete}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
         </CardContent>
       </Card>
     </motion.div>

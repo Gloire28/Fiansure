@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Stack } from '@mui/material';
+import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -16,7 +17,6 @@ function AccountsPage() {
       try {
         const accountsRes = await getAccounts();
         setAccounts(accountsRes.data);
-        console.log('Fetched active accounts:', accountsRes.data.map(a => ({ id: a._id, nom: a.nom, statut: a.statut })));
       } catch (err) {
         console.error('Failed to fetch accounts:', err.response?.status, err.response?.data);
       }
@@ -26,35 +26,53 @@ function AccountsPage() {
 
   const handleAccountDelete = (id) => {
     setAccounts(accounts.filter(a => a._id !== id));
-    console.log('Account deleted:', id);
   };
 
   return (
     <DndProvider backend={HTML5Backend}>
       <Box sx={{ p: 2 }}>
-        <Typography variant="h4">Mes Comptes</Typography>
-        {!isAccountLimitReached(accounts) && (
+        <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>
+          Mes Comptes
+        </Typography>
+
+        <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+          {!isAccountLimitReached(accounts) && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/comptes/new')}
+              sx={{
+                bgcolor: '#4CAF50',
+                '&:hover': { bgcolor: '#43A047' },
+                borderRadius: '30px',
+                px: 3,
+                py: 1.5,
+                fontWeight: 'bold',
+                textTransform: 'none'
+              }}
+            >
+              Créer un Compte
+            </Button>
+          )}
+
           <Button
             variant="contained"
-            onClick={() => {
-              navigate('/comptes/new');
-              console.log('Navigated to create account');
+            startIcon={<DeleteIcon />}
+            onClick={() => navigate('/comptes/trash')}
+            sx={{
+              bgcolor: '#F44336',
+              '&:hover': { bgcolor: '#E53935' },
+              borderRadius: '30px',
+              px: 3,
+              py: 1.5,
+              fontWeight: 'bold',
+              textTransform: 'none'
             }}
-            sx={{ m: 2 }}
           >
-            Créer un Compte
+            Corbeille
           </Button>
-        )}
-        <Button
-          variant="contained"
-          onClick={() => {
-            navigate('/comptes/trash');
-            console.log('Navigated to accounts trash');
-          }}
-          sx={{ m: 2 }}
-        >
-          Corbeille
-        </Button>
+        </Stack>
+
         {accounts.map(account => (
           <CardAccount key={account._id} account={account} onDelete={handleAccountDelete} />
         ))}
