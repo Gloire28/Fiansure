@@ -28,7 +28,7 @@ function HistoryList({ items, entrees }) {
                   <React.Fragment key={entree._id || index}>
                     <ListItem sx={{ py: 1 }}>
                       <ListItemText
-                        primary={`${entree.libelle || 'Sans libellé'} - ${entree.montant.toFixed(2)} FCFA`}
+                        primary={`${entree.libelle || 'Sans libellé'} - ${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(entree.montant)} FCFA`}
                         secondary={`Entrée - ${new Date(entree.date).toLocaleDateString()}`}
                         primaryTypographyProps={{ fontWeight: 500, color: '#212121' }}
                         secondaryTypographyProps={{ color: '#4CAF50' }}
@@ -66,7 +66,7 @@ function HistoryList({ items, entrees }) {
                     <React.Fragment key={mvt._id || index}>
                       <ListItem sx={{ py: 1 }}>
                         <ListItemText
-                          primary={`${mvt.libelle || 'Sans libellé'} - ${mvt.montant.toFixed(2)} FCFA`}
+                          primary={`${mvt.libelle || 'Sans libellé'} - ${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(mvt.montant)} FCFA`}
                           secondary={`${mvt.type === 'entree' ? 'Entrée' : 'Sortie'} - ${new Date(mvt.date).toLocaleDateString()}`}
                           primaryTypographyProps={{ fontWeight: 500, color: '#212121' }}
                           secondaryTypographyProps={{ color: mvt.type === 'entree' ? '#4CAF50' : '#F44336' }}
