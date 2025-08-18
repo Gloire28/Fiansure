@@ -1,4 +1,3 @@
-// RegisterPage.jsx
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +14,9 @@ function RegisterPage({ onLogin }) {
     try {
       const res = await register(form);
       localStorage.setItem('token', res.data.token);
-      onLogin();
+      localStorage.setItem('userId', res.data.user.userId); // Sauvegarde de userId
+      localStorage.setItem('userName', `${res.data.user.nom} ${res.data.user.prenom}`); // Mise à jour du nom
+      onLogin(res.data.user.prenom, res.data.user.userId); // Passe prenom et userId à onLogin
       alert('Bienvenue sur Finansure ! Créez des objectifs ou comptes depuis le tableau de bord.');
       navigate('/home');
     } catch (err) {

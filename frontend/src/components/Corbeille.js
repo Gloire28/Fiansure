@@ -38,7 +38,7 @@ function Corbeille({ items, onRestore, isGoal }) {
                       Date de fin: {new Date(item.dateFin).toLocaleDateString()}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                      Montant total entré: {(item.entrees ? item.entrees.reduce((sum, entree) => sum + entree.montant, 0) : 0).toFixed(2)} FCFA
+                      Montant total entré: {(item.entrees ? item.entrees.reduce((sum, entrée) => sum + entrée.montant, 0) : 0).toFixed(2)} FCFA
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       Progression: {item.progression ? item.progression.toFixed(2) : 0}%

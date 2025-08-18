@@ -15,7 +15,10 @@ function LoginPage({ onLogin }) {
       const res = await login(form);
       localStorage.setItem('token', res.data.token);
       const prenom = res.data.user?.prenom || 'Utilisateur';
-      onLogin(prenom);
+      const userId = res.data.user?.userId; // Identifiant personnalisé
+      if (userId) localStorage.setItem('userId', userId);
+      localStorage.setItem('userName', `${res.data.user?.nom || ''} ${prenom}`);
+      onLogin(prenom, userId); // Passe userId à onLogin
       navigate('/home');
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur de connexion');

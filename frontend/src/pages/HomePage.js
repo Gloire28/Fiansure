@@ -1,25 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Paper } from '@mui/material';
+import { Box, Typography, Grid, Paper, Button, Alert } from '@mui/material';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { motion } from 'framer-motion';
-import { getGoals, getAccounts } from '../services/api';
+import { getGoals, getAccounts, getPendingInvitations, acceptInvitation } from '../services/api';
 import CardGoal from '../components/CardGoal';
 import CardAccount from '../components/CardAccount';
 
 function HomePage() {
   const [goals, setGoals] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [pendingInvitations, setPendingInvitations] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const goalsRes = await getGoals();
-        const accountsRes = await getAccounts();
+        console.log('Fetching data for HomePage');
+        const [goalsRes, accountsRes, invitationsRes] = await Promise.all([
+          getGoals(),
+          getAccounts(),
+          getPendingInvitations()
+        ]);
+        console.log('Fetched goals:', goalsRes.data);
+        console.log('Fetched accounts:', accountsRes.data);
+        console.log('Fetched pending invitations:', invitationsRes.data);
         setGoals(goalsRes.data);
         setAccounts(accountsRes.data);
+        setPendingInvitations(invitationsRes.data);
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching data in HomePage:', err);
+        setError('Erreur lors du chargement des données');
       }
     };
     fetchData();
@@ -27,6 +38,18 @@ function HomePage() {
 
   const handleGoalDelete = (id) => setGoals(goals.filter((g) => g._id !== id));
   const handleAccountDelete = (id) => setAccounts(accounts.filter((a) => a._id !== id));
+  const handleAcceptInvitation = async (accountId) => {
+    try {
+      console.log('Accepting invitation for accountId:', accountId);
+      await acceptInvitation(accountId);
+      console.log('Invitation accepted, updating state');
+      setPendingInvitations(pendingInvitations.filter(inv => inv.accountId !== accountId));
+      setError('');
+    } catch (err) {
+      console.error('Error accepting invitation in HomePage:', err);
+      setError('Erreur lors de l\'acceptation de l\'invitation');
+    }
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -49,6 +72,38 @@ function HomePage() {
         >
           Tableau de Bord
         </Typography>
+
+        {/* Section des invitations en attente */}
+        {pendingInvitations.length > 0 && (
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              mb: 4,
+              backgroundColor: 'white',
+            }}
+          >
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: '#34495e' }}>
+              Invitations en attente
+            </Typography>
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            {pendingInvitations.map((inv, index) => (
+              <Box key={inv.accountId} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                <Typography>Compte : {inv.accountName}</Typography>
+                <Typography>Invité par : {inv.invitedBy}</Typography>
+                <Typography>Date : {new Date(inv.dateSent).toLocaleDateString()}</Typography>
+                <Button
+                  variant="contained"
+                  sx={{ mt: 1, bgcolor: '#1976D2', '&:hover': { bgcolor: '#1565C0' } }}
+                  onClick={() => handleAcceptInvitation(inv.accountId)}
+                >
+                  Accepter
+                </Button>
+              </Box>
+            ))}
+          </Paper>
+        )}
 
         {/* Mes Objectifs */}
         <Paper

@@ -5,6 +5,7 @@ import { ThemeContext } from '../context/ThemeContext';
 
 function Header({ isAuthenticated, userName }) {
   const { mode, toggleTheme } = useContext(ThemeContext);
+  const userId = localStorage.getItem('userId') || 'Non défini';
 
   return (
     <AppBar position="sticky" sx={{ bgcolor: '#1976D2', boxShadow: '0 4px 10px rgba(0,0,0,0.15)' }}>
@@ -26,9 +27,14 @@ function Header({ isAuthenticated, userName }) {
 
         {/* User Info */}
         {isAuthenticated && (
-          <Typography variant="body1" sx={{ color: '#fff', fontWeight: 700 }}>
-            {userName || 'Utilisateur'}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body1" sx={{ color: '#fff', fontWeight: 700, mr: 2 }}>
+              {userName || 'Utilisateur'}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#fff', fontStyle: 'italic' }}>
+              ID: {userId}
+            </Typography>
+          </Box>
         )}
       </Toolbar>
     </AppBar>

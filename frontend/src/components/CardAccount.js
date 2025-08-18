@@ -3,6 +3,7 @@ import { Card, CardContent, Typography, IconButton, Box, LinearProgress } from '
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
+import MessageIcon from '@mui/icons-material/Message';
 import { useDrag } from 'react-dnd';
 import { Line } from 'react-chartjs-2';
 import { deleteAccount } from '../services/api';
@@ -10,7 +11,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
 
-function CardAccount({ account, onDelete }) {
+function CardAccount({ account, onDelete, showMessages }) {
   const navigate = useNavigate();
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'ACCOUNT',
@@ -45,7 +46,6 @@ function CardAccount({ account, onDelete }) {
     }]
   };
 
-  // Pour le mini-indicateur de solde (pourcentage)
   const totalBalance = account.solde ?? 0;
   const balancePercent = Math.min(Math.max((totalBalance / 100000) * 100, 0), 100);
 
@@ -63,12 +63,8 @@ function CardAccount({ account, onDelete }) {
         '&:hover': { boxShadow: '0 8px 24px rgba(0,0,0,0.2)' },
         width: '100%',
       }}>
-        <CardContent onClick={() => {
-          navigate(`/comptes/${account._id}`);
-          console.log('Navigated to account:', account._id);
-        }}>
+        <CardContent onClick={() => navigate(`/comptes/${account._id}`)}>
           <Box sx={{ display: 'flex', alignItems: 'stretch', height: '100%' }}>
-            
             {/* Gauche : Box moderne responsive */}
             <Box sx={{ 
               display: 'flex',
@@ -135,10 +131,15 @@ function CardAccount({ account, onDelete }) {
             </Box>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
             <IconButton onClick={handleDelete}>
               <DeleteIcon />
             </IconButton>
+            {showMessages && (
+              <IconButton onClick={() => navigate(`/comptes/${account._id}/messages`)}>
+                <MessageIcon color="primary" />
+              </IconButton>
+            )}
           </Box>
         </CardContent>
       </Card>

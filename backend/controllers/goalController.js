@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const createGoal = async (req, res, next) => {
   try {
     const { nom, montantCible, dateDebut, dateFin, couleur } = req.body;
-    const userId = req.userId;
+    const userId = req.user.userId; // Utiliser req.user.userId
     console.log('Creating goal:', { nom, montantCible, dateDebut, dateFin, userId });
 
     if (new Date(dateDebut) > new Date()) {
@@ -15,7 +15,7 @@ const createGoal = async (req, res, next) => {
       console.log('Invalid end date:', dateFin);
       return res.status(400).json({ message: 'Date de fin invalide' });
     }
-    const activeGoals = await Goal.countDocuments({ userId, statut: 'actif' });
+    const activeGoals = await Goal.countDocuments({ userId, statut: 'actif' }); // Filtrer avec userId String
     if (activeGoals >= 5) {
       console.log('Goal limit reached:', activeGoals);
       return res.status(400).json({ message: 'Limite de 5 objectifs actifs atteinte' });
@@ -33,8 +33,9 @@ const createGoal = async (req, res, next) => {
 
 const getGoals = async (req, res, next) => {
   try {
-    const goals = await Goal.find({ userId: req.userId, statut: 'actif' });
-    console.log('Fetched goals for user:', req.userId, goals.length, goals.map(g => ({ id: g._id, progression: g.progression })));
+    const userId = req.user.userId; // Utiliser req.user.userId
+    const goals = await Goal.find({ userId, statut: 'actif' }); // Filtrer avec userId String
+    console.log('Fetched goals for user:', userId, goals.length, goals.map(g => ({ id: g._id, progression: g.progression })));
     res.json(goals);
   } catch (error) {
     console.error('Error fetching goals:', error);
@@ -48,7 +49,7 @@ const getGoal = async (req, res, next) => {
       console.log('Invalid goal ID:', req.params.id);
       return res.status(400).json({ message: 'ID d\'objectif invalide' });
     }
-    const goal = await Goal.findOne({ _id: req.params.id, userId: req.userId });
+    const goal = await Goal.findOne({ _id: req.params.id, userId: req.user.userId }); // Filtrer avec userId String
     if (!goal) {
       console.log('Goal not found:', req.params.id);
       return res.status(404).json({ message: 'Objectif non trouvé' });
@@ -73,13 +74,13 @@ const addEntry = async (req, res, next) => {
       console.log('Invalid goal ID for entry:', req.params.id);
       return res.status(400).json({ message: 'ID d\'objectif invalide' });
     }
-    const goal = await Goal.findOne({ _id: req.params.id, userId: req.userId });
+    const goal = await Goal.findOne({ _id: req.params.id, userId: req.user.userId }); // Filtrer avec userId String
     if (!goal) {
       console.log('Goal not found for entry:', req.params.id);
       return res.status(404).json({ message: 'Objectif non trouvé' });
     }
     
-    goal.entrees.push({ montant, libelle: libelle || '' }); // Libellé optionnel
+    goal.entrees.push({ montant, libelle: libelle || '' });
     await goal.save();
     console.log('Entry added to goal:', goal._id, 'New progression:', goal.progression);
     res.json(goal);
@@ -96,7 +97,7 @@ const updateGoalDate = async (req, res, next) => {
       console.log('Invalid goal ID for update:', req.params.id);
       return res.status(400).json({ message: 'ID d\'objectif invalide' });
     }
-    const goal = await Goal.findOne({ _id: req.params.id, userId: req.userId });
+    const goal = await Goal.findOne({ _id: req.params.id, userId: req.user.userId }); // Filtrer avec userId String
     if (!goal) {
       console.log('Goal not found for update:', req.params.id);
       return res.status(404).json({ message: 'Objectif non trouvé' });
@@ -124,7 +125,7 @@ const deleteGoal = async (req, res, next) => {
       console.log('Invalid goal ID for deletion:', req.params.id);
       return res.status(400).json({ message: 'ID d\'objectif invalide' });
     }
-    const goal = await Goal.findOne({ _id: req.params.id, userId: req.userId });
+    const goal = await Goal.findOne({ _id: req.params.id, userId: req.user.userId }); // Filtrer avec userId String
     if (!goal) {
       console.log('Goal not found for deletion:', req.params.id);
       return res.status(404).json({ message: 'Objectif non trouvé' });
@@ -142,8 +143,9 @@ const deleteGoal = async (req, res, next) => {
 
 const getCorbeille = async (req, res, next) => {
   try {
-    const goals = await Goal.find({ userId: req.userId, statut: 'corbeille' });
-    console.log('Fetched trash goals for user:', req.userId, goals.length);
+    const userId = req.user.userId; // Utiliser req.user.userId
+    const goals = await Goal.find({ userId, statut: 'corbeille' }); // Filtrer avec userId String
+    console.log('Fetched trash goals for user:', userId, goals.length);
     res.json(goals);
   } catch (error) {
     console.error('Error fetching trash goals:', error);
@@ -157,7 +159,7 @@ const restoreGoal = async (req, res, next) => {
       console.log('Invalid goal ID for restore:', req.params.id);
       return res.status(400).json({ message: 'ID d\'objectif invalide' });
     }
-    const goal = await Goal.findOne({ _id: req.params.id, userId: req.userId });
+    const goal = await Goal.findOne({ _id: req.params.id, userId: req.user.userId }); // Filtrer avec userId String
     if (!goal) {
       console.log('Goal not found for restore:', req.params.id);
       return res.status(404).json({ message: 'Objectif non trouvé' });

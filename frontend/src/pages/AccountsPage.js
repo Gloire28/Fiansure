@@ -16,6 +16,7 @@ function AccountsPage() {
     const fetchData = async () => {
       try {
         const accountsRes = await getAccounts();
+        // Plus besoin de filtrer ici, le backend gère l'authentification avec userId
         setAccounts(accountsRes.data);
       } catch (err) {
         console.error('Failed to fetch accounts:', err.response?.status, err.response?.data);
@@ -73,9 +74,20 @@ function AccountsPage() {
           </Button>
         </Stack>
 
-        {accounts.map(account => (
-          <CardAccount key={account._id} account={account} onDelete={handleAccountDelete} />
-        ))}
+        {accounts.length === 0 ? (
+          <Typography variant="body1" sx={{ textAlign: 'center', color: '#666' }}>
+            Aucun compte disponible.
+          </Typography>
+        ) : (
+          accounts.map(account => (
+            <CardAccount 
+              key={account._id} 
+              account={account} 
+              onDelete={handleAccountDelete}
+              showMessages={account.assignedUserId === localStorage.getItem('userId')} // Utiliser userId au lieu de userObjectId
+            />
+          ))
+        )}
       </Box>
     </DndProvider>
   );

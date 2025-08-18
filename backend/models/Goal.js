@@ -1,8 +1,7 @@
-
 const mongoose = require('mongoose');
 
 const goalSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: String, ref: 'User.userId', required: true }, // Changé en String
   nom: { type: String, required: true },
   montantCible: { type: Number, required: true, min: 0 },
   dateDebut: { type: Date, required: true },

@@ -1,3 +1,4 @@
+
 const express = require('express');
 const { createGoal, getGoals, getGoal, addEntry, updateGoalDate, deleteGoal, getCorbeille, restoreGoal } = require('../controllers/goalController');
 const authMiddleware = require('../middlewares/authMiddleware');

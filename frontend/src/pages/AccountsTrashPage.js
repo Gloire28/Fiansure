@@ -12,15 +12,7 @@ function AccountsTrashPage() {
   useEffect(() => {
     const fetchCorbeille = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error('No token found, redirecting to login');
-          navigate('/login');
-          return;
-        }
-        console.log('Token for getCorbeilleAccounts:', token);
         const res = await getCorbeilleAccounts();
-        console.log('Raw response from getCorbeilleAccounts:', res);
         setCorbeille(res.data || []);
         console.log('Fetched deleted accounts:', res.data?.map(a => ({ id: a._id, nom: a.nom, statut: a.statut })) || []);
         setError(null);

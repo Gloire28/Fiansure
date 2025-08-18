@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
@@ -14,23 +14,48 @@ import AccountsTrashPage from './pages/AccountsTrashPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import BottomNav from './components/BottomNav';
+import DiscussionsPage from './pages/DiscussionsPage';
+import MessageDetailPage from './pages/MessageDetailPage';
+import { getDiscussions } from './services/api';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || ''); // Ajout de userId
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
-  const handleLogin = (name) => {
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (isAuthenticated) {
+        try {
+          const res = await getDiscussions();
+          const totalUnread = res.data.reduce((sum, disc) => sum + (disc.unreadCount || 0), 0);
+          setUnreadMessagesCount(totalUnread);
+        } catch (err) {
+          console.error('Error fetching discussions:', err);
+        }
+      }
+    };
+    fetchUnreadCount();
+  }, [isAuthenticated]);
+
+  const handleLogin = (name, userId) => { // Accepter userId comme paramètre
     setIsAuthenticated(true);
     setUserName(name);
+    setUserId(userId); // Mettre à jour userId
     localStorage.setItem('userName', name);
-    console.log('User logged in with name:', name);
+    localStorage.setItem('userId', userId); // Sauvegarder userId
+    console.log('User logged in with name:', name, 'and userId:', userId);
   };
   
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
+    localStorage.removeItem('userId');
     setIsAuthenticated(false);
     setUserName('');
+    setUserId(''); // Réinitialiser userId
+    setUnreadMessagesCount(0);
     console.log('User logged out');
   };
 
@@ -50,9 +75,11 @@ function App() {
         <Route path="/comptes/new" element={isAuthenticated ? <AccountCreatePage /> : <Navigate to="/login" />} />
         <Route path="/comptes/trash" element={isAuthenticated ? <AccountsTrashPage /> : <Navigate to="/login" />} />
         <Route path="/comptes/:id" element={isAuthenticated ? <AccountDetailPage /> : <Navigate to="/login" />} />
+        <Route path="/discussions" element={isAuthenticated ? <DiscussionsPage /> : <Navigate to="/login" />} />
+        <Route path="/discussions/:accountId" element={isAuthenticated ? <MessageDetailPage /> : <Navigate to="/login" />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
-      <BottomNav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      <BottomNav isAuthenticated={isAuthenticated} onLogout={handleLogout} unreadMessagesCount={unreadMessagesCount} />
     </>
   );
 }
